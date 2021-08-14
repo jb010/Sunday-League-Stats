@@ -1,2 +1,2 @@
 # main
-new
+just starting out
