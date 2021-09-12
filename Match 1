@@ -1,0 +1,44 @@
+library(StatsBombR)
+library(tidyverse)
+library(ggsoccer)
+library(ggrepel)
+
+# Load in the data
+match_1 <- data.frame(read_csv("~Jonah/Documents/R/BruceCastleRovers/CSVs/Bricklayers0509_3.csv"))
+
+# Separate out the data into the selections to use for each layer of the plot
+match_1_goals <- match_1 %>%
+  filter(Event == "Shot")
+match_1_passes <- match_1 %>%
+  filter(Event != "Shot")
+match_1_goalscorers <- match_1_goals$Player
+
+# Plot the data
+ggplot(data = match_1, 
+       aes(x = X, y = Y, xend = X2, yend = Y2)) +
+  annotate_pitch() +
+  theme_pitch() +
+  geom_segment(data = match_1_passes,
+               aes(colour = as.factor(Goal)),
+               alpha = 0.7,
+               arrow = arrow(length = unit(0.1, "inches")),
+               size = 0.8,
+               lineend = "square",
+               linejoin = "round",
+               arrow.fill = "black") +
+  coord_flip(xlim = c(40, 100)) +
+  geom_segment(data = match_1_goals,
+             aes(x = X, y = Y, xend = X2, yend = Y2),
+             arrow = arrow(length = unit(0.1, "inches")),
+             colour = "black",
+             alpha = 0.9,
+             size = 1) +
+  geom_label_repel(data = match_1_goals, 
+            aes(label = match_1_goalscorers,
+                size = 3),
+            point.padding = unit(0.15, "inches"),
+            nudge_y = -6,
+            nudge_x = -2) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.16)) +
+  labs(title = "Bruce Castle Rovers goals vs. Bricklayers")
